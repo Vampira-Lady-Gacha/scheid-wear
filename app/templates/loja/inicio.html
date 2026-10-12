@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m with context %}
+
+{% block og_imagem %}{% if destaque and destaque.foto_capa %}<meta property="og:image" content="{{ url_publica }}/media/{{ destaque.foto_capa.arquivo }}">{% else %}{{ super() }}{% endif %}{% endblock %}
+
+{% block conteudo %}
+<section class="vitrine" aria-labelledby="drop-titulo">
+  <div class="vitrine-etiqueta etiqueta-tecida">
+    <p class="vitrine-codigo"><span class="ao-vivo">À venda agora</span><span>{{ loja.drop_codigo }}</span></p>
+    <h1 class="vitrine-nome" id="drop-titulo">{{ loja.drop_nome }}</h1>
+    <p class="vitrine-bordao">{{ loja.bordao }}</p>
+  </div>
+
+  {% if destaque %}
+  <div class="vitrine-palco">
+    <a class="vitrine-foto" href="/peca/{{ destaque.slug }}" aria-label="Ver {{ destaque.nome }}">{{ m.placa(destaque, prioridade=True) }}</a>
+    <div class="tag-pendurada" data-tag-balanca>
+      <svg class="barbante" viewBox="0 0 40 120" preserveAspectRatio="none" aria-hidden="true"><path d="M20 0 C 8 40, 30 70, 20 120"/></svg>
+      <article class="tag tag-grande peca-destaque">
+        <span class="tag-furo" aria-hidden="true"></span>
+        <div class="tag-corpo">
+          <p class="tag-numero rotulo-impresso"><span>{{ destaque.numero_fmt }}</span><span>{{ destaque.drop or loja.drop_codigo }}</span><span>{{ total_drop }} peças no drop</span></p>
+          <h2 class="tag-nome"><a href="/peca/{{ destaque.slug }}">{{ destaque.nome }}</a></h2>
+          {{ m.preco(destaque) }}
+          {{ m.form_compra(destaque, quantidade=False) }}
+          <a class="tag-detalhes" href="/peca/{{ destaque.slug }}">Fotos e detalhes da peça <svg class="ico" aria-hidden="true"><use href="#i-seta"/></svg></a>
+        </div>
+      </article>
+    </div>
+  </div>
+  {% else %}
+  <div class="vitrine-vazia">
+    <p>O drop ainda não tem peças à venda. Volte em breve ou siga <a href="https://www.instagram.com/{{ loja.instagram }}/" rel="noopener" target="_blank">@{{ loja.instagram }}</a>.</p>
+  </div>
+  {% endif %}
+</section>
+
+{% if drop %}
+<section class="secao trilho-secao" aria-labelledby="trilho-titulo">
+  <div class="secao-cabeca">
+    <h2 class="titulo-secao" id="trilho-titulo">O drop inteiro</h2>
+    <p class="texto">{{ loja.drop_texto }}</p>
+  </div>
+  <div class="trilho">
+    {% for p in drop %}{{ m.tag(p, loja) }}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="secao instrucoes-secao" aria-labelledby="instrucoes-titulo">
+  <div class="instrucoes">
+    <h2 class="rotulo-impresso instrucoes-titulo" id="instrucoes-titulo">Instruções de compra</h2>
+    <dl class="instrucoes-lista">
+      <div>
+        <dt><svg class="ico" aria-hidden="true"><use href="#i-regua"/></svg>Tamanho</dt>
+        <dd>Cada peça tem tabela de medidas em centímetros. Na dúvida, chame no WhatsApp antes de comprar.</dd>
+      </div>
+      <div>
+        <dt><svg class="ico" aria-hidden="true"><use href="#i-caminhao"/></svg>Frete</dt>
+        <dd>R$ {{ loja.frete_fixo }} para qualquer CEP do Brasil{% if loja.frete_gratis_acima %}; grátis em compras a partir de R$ {{ loja.frete_gratis_acima }}{% endif %}. {{ loja.prazo_postagem }}</dd>
+      </div>
+      <div>
+        <dt><svg class="ico" aria-hidden="true"><use href="#i-qr"/></svg>Pix</dt>
+        <dd>Fechou o pedido, o QR Code aparece na hora com o valor exato. Sem cadastro e sem senha.</dd>
+      </div>
+      <div>
+        <dt><svg class="ico" aria-hidden="true"><use href="#i-troca"/></svg>Troca</dt>
+        <dd>7 dias depois de receber para trocar o tamanho ou desistir, com a peça sem uso e com etiqueta.</dd>
+      </div>
+    </dl>
+    <p class="instrucoes-rodape"><a href="/ajuda">Todas as respostas em Ajuda <svg class="ico" aria-hidden="true"><use href="#i-seta"/></svg></a></p>
+  </div>
+</section>
+
+{% if outras %}
+<section class="secao trilho-secao" aria-labelledby="outras-titulo">
+  <div class="secao-cabeca"><h2 class="titulo-secao" id="outras-titulo">Fora do drop</h2></div>
+  <div class="trilho">
+    {% for p in outras %}{{ m.tag(p, loja) }}{% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

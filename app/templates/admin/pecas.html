@@ -1,0 +1,38 @@
+{% extends "admin/base.html" %}
+{% block titulo %}Peças{% endblock %}
+
+{% block conteudo %}
+<div class="painel-cabeca">
+  <h1>Peças</h1>
+  <div class="acoes"><a class="botao" href="/admin/pecas/nova"><svg class="ico" aria-hidden="true"><use href="#i-mais"/></svg> Nova peça</a></div>
+</div>
+
+<section class="bloco">
+  <form method="get" class="busca">
+    <label class="sr" for="q">Buscar</label>
+    <input class="entrada" id="q" type="search" name="q" value="{{ q }}" placeholder="Buscar por nome ou drop">
+    <button class="botao" type="submit" aria-label="Buscar"><svg class="ico" aria-hidden="true"><use href="#i-busca"/></svg></button>
+  </form>
+  {% if pecas %}
+  <div class="tabela-rolagem">
+    <table class="tabela">
+      <thead><tr><th></th><th>Peça</th><th>Categoria</th><th class="dir">Preço</th><th class="dir">Estoque</th><th>Situação</th></tr></thead>
+      <tbody>
+      {% for p in pecas %}
+        <tr>
+          <td class="col-mini">{% if p.foto_capa %}<img class="mini" src="/media/{{ p.foto_capa.arquivo }}" alt="" loading="lazy">{% else %}<span class="mini"></span>{% endif %}</td>
+          <td><a href="/admin/pecas/{{ p.id }}">{{ p.nome }}</a><small>{{ p.numero_fmt }}{% if p.drop %} · {{ p.drop }}{% endif %}</small></td>
+          <td>{{ p.categoria.nome if p.categoria else '—' }}</td>
+          <td class="dir">{{ p.preco | reais }}{% if p.preco_de %}<small><s>{{ p.preco_de | reais }}</s></small>{% endif %}</td>
+          <td class="dir{% if p.estoque_total == 0 %} zerado{% endif %}">{{ p.estoque_total }}</td>
+          <td>{% if not p.ativa %}<span class="selo inativo">Fora da loja</span>{% elif p.estoque_total == 0 %}<span class="selo">Esgotada</span>{% elif p.destaque %}<span class="selo destaque">Destaque</span>{% else %}<span class="selo ativo">Na loja</span>{% endif %}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="bloco-nota">{% if q %}Nenhuma peça com “{{ q }}”.{% else %}Nenhuma peça cadastrada ainda. Comece por “Nova peça”.{% endif %}</p>
+  {% endif %}
+</section>
+{% endblock %}

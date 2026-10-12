@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block titulo %}{{ loja.nome_loja }} · {{ loja.drop_codigo }} — {{ loja.drop_nome }}{% endblock %}</title>
+  <meta name="description" content="{% block descricao %}{{ loja.nome_loja }} | Streetwear. {{ loja.linha }}. {{ loja.bordao }} {{ loja.drop_codigo }} — {{ loja.drop_nome }} à venda. Enviamos para todo o Brasil, pagamento por Pix.{% endblock %}">
+  <meta name="theme-color" content="#f1f0ec">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ loja.nome_loja }}">
+  <meta property="og:title" content="{{ self.titulo() }}">
+  <meta property="og:description" content="{{ self.descricao() }}">
+  {% block og_imagem %}<meta property="og:image" content="{{ url_publica }}/static/img/og.jpg">{% endblock %}
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/static/fonts/anybody-400-900.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/static/css/fontes.css?v={{ VERSAO_ESTATICOS }}">
+  <link rel="stylesheet" href="/static/css/loja.css?v={{ VERSAO_ESTATICOS }}">
+  {% block cabeca %}{% endblock %}
+</head>
+<body>
+  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+  {% include "_icones.html" %}
+  {% set caminho = request.url.path %}
+
+  <header class="topo">
+    <p class="topo-aviso"><svg class="ico" aria-hidden="true"><use href="#i-caminhao"/></svg>
+      Enviamos para todo o Brasil{% if loja.frete_gratis_acima %} · frete grátis acima de R$ {{ loja.frete_gratis_acima }}{% endif %} · Pix na hora</p>
+    <div class="topo-miolo">
+      <a class="marca" href="/" aria-label="{{ loja.nome_loja }}, página inicial">
+        <span class="marca-nome">{{ loja.nome_loja }}</span>
+        <span class="marca-linha">{{ loja.linha }}</span>
+      </a>
+      <nav class="menu" aria-label="Principal">
+        <a href="/" {% if caminho == '/' %}aria-current="page"{% endif %}>Drop</a>
+        <a href="/catalogo" {% if caminho.startswith('/catalogo') or caminho.startswith('/peca') %}aria-current="page"{% endif %}>Catálogo</a>
+        <a class="some-pequeno" href="/ajuda" {% if caminho == '/ajuda' %}aria-current="page"{% endif %}>Ajuda</a>
+        <a class="botao-sacola" href="/sacola" data-botao-sacola {% if caminho == '/sacola' %}aria-current="page"{% endif %}>
+          <svg class="ico" aria-hidden="true"><use href="#i-sacola"/></svg>
+          <span class="rotulo">Sacola</span>
+          <span class="contador" data-contador data-zero aria-hidden="true">0</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="conteudo">
+    {% block conteudo %}{% endblock %}
+  </main>
+
+  <footer class="rodape">
+    <div class="rodape-etiqueta etiqueta-tecida">
+      <p class="rodape-marca">{{ loja.nome_loja }}</p>
+      <p class="rodape-linha">{{ loja.linha }}</p>
+      <p class="rodape-bordao">{{ loja.bordao }}</p>
+    </div>
+    <div class="rodape-miolo">
+      <div>
+        <h2 class="rotulo-impresso">Loja</h2>
+        <ul>
+          <li><a href="/">{{ loja.drop_codigo }} — {{ loja.drop_nome }}</a></li>
+          <li><a href="/catalogo">Catálogo completo</a></li>
+          <li><a href="/sacola">Sacola</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="rotulo-impresso">Ajuda</h2>
+        <ul>
+          <li><a href="/ajuda#comprar">Como comprar</a></li>
+          <li><a href="/ajuda#envio">Envio e prazos</a></li>
+          <li><a href="/ajuda#trocas">Trocas e devoluções</a></li>
+          <li><a href="/ajuda#tamanhos">Tabela de medidas</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="rotulo-impresso">Fale com a gente</h2>
+        <ul>
+          <li><a href="{{ link_whatsapp(loja.whatsapp) }}" rel="noopener" target="_blank"><svg class="ico" aria-hidden="true"><use href="#i-zap"/></svg> WhatsApp {{ loja.whatsapp | telefone }}</a></li>
+          <li><a href="https://www.instagram.com/{{ loja.instagram }}/" rel="noopener" target="_blank"><svg class="ico" aria-hidden="true"><use href="#i-insta"/></svg> @{{ loja.instagram }}</a></li>
+          {% if loja.email %}<li><a href="mailto:{{ loja.email }}">{{ loja.email }}</a></li>{% endif %}
+        </ul>
+      </div>
+      <div class="rodape-base">
+        <span>© {{ loja.nome_loja }} · Pagamento por Pix · Envio para todo o Brasil</span>
+        <a href="/admin">Área da equipe</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="recado" data-recado role="status" aria-live="polite" hidden></div>
+  <script src="/static/js/loja.js?v={{ VERSAO_ESTATICOS }}" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

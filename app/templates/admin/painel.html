@@ -1,0 +1,78 @@
+{% extends "admin/base.html" %}
+{% block titulo %}Visão geral{% endblock %}
+
+{% block conteudo %}
+<div class="painel-cabeca">
+  <h1>Visão geral</h1>
+  <div class="acoes"><a class="botao" href="/admin/pecas/nova"><svg class="ico" aria-hidden="true"><use href="#i-mais"/></svg> Nova peça</a></div>
+</div>
+
+{% if whatsapp_exemplo %}
+<p class="aviso atencao">O WhatsApp da loja ainda é um número de exemplo. Troque em <a href="/admin/configuracoes">Loja</a> para receber as mensagens dos clientes.</p>
+{% endif %}
+{% if sem_pix %}
+<p class="aviso atencao">Sem chave Pix cadastrada: os pedidos vão para o WhatsApp para combinar o pagamento. Cadastre a chave em <a href="/admin/configuracoes">Loja</a> e o site gera o QR Code sozinho.</p>
+{% endif %}
+{% if ha_exemplo %}
+<div class="aviso atencao"><span>As 5 camisetas do DROP 001 foram cadastradas a partir das artes da marca. <b>Preço (R$ 149,90) e estoque são de exemplo</b>, e faltam tabela de medidas e cuidados de lavagem. Confira cada uma em <a href="/admin/pecas">Peças</a>.</span>
+  <form method="post" action="/admin/exemplo-revisado"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="botao botao-linha pequeno" type="submit">Já revisei</button></form></div>
+{% endif %}
+
+<div class="resumo-painel">
+  <a href="/admin/pedidos?status=aguardando"><span>Aguardando pagamento</span><b class="num">{{ aguardando | length }}</b></a>
+  <a href="/admin/pedidos?status=pago"><span>Pagos, a enviar</span><b class="num">{{ a_enviar | length }}</b></a>
+  <div><span>Pedidos nos últimos 7 dias</span><b class="num">{{ pedidos_7d }}</b></div>
+  <div><span>Vendido no mês (pagos)</span><b class="num">{{ vendido_mes | reais }}</b></div>
+</div>
+
+{% macro tabela_pedidos(lista, vazio) %}
+{% if lista %}
+<div class="tabela-rolagem">
+  <table class="tabela">
+    <thead><tr><th>Pedido</th><th>Cliente</th><th>Destino</th><th class="dir">Peças</th><th class="dir">Total</th></tr></thead>
+    <tbody>
+    {% for p in lista %}
+      <tr>
+        <td><a href="/admin/pedidos/{{ p.id }}">{{ p.codigo }}</a><small>{{ p.criado_em.strftime('%d/%m %H:%M') }}</small></td>
+        <td>{{ p.nome }}<small>{{ p.whatsapp | telefone }}</small></td>
+        <td>{{ p.cidade }}/{{ p.uf }}</td>
+        <td class="dir">{{ p.quantidade_pecas }}</td>
+        <td class="dir">{{ p.total | reais }}<small>{{ PAGAMENTOS[p.pagamento] }}</small></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="bloco-nota">{{ vazio }}</p>
+{% endif %}
+{% endmacro %}
+
+<section class="bloco">
+  <h2>Aguardando pagamento <small><a href="/admin/pedidos">Ver todos</a></small></h2>
+  {{ tabela_pedidos(aguardando, "Nenhum pedido esperando pagamento. Quando alguém fechar um pedido no site, ele aparece aqui na hora.") }}
+</section>
+
+<section class="bloco">
+  <h2>Pagos, a enviar</h2>
+  {{ tabela_pedidos(a_enviar, "Nada para postar agora.") }}
+</section>
+
+<section class="bloco">
+  <h2>Estoque baixo <small>{{ baixo | length }} variações com 2 ou menos</small></h2>
+  {% if baixo %}
+  <div class="tabela-rolagem">
+    <table class="tabela">
+      <thead><tr><th>Peça</th><th>Cor</th><th>Tamanho</th><th class="dir">Estoque</th></tr></thead>
+      <tbody>
+      {% for v in baixo[:20] %}
+        <tr><td><a href="/admin/pecas/{{ v.peca.id }}#grade">{{ v.peca.nome }}</a></td><td>{{ v.cor }}</td><td>{{ v.tamanho }}</td><td class="dir{% if v.estoque == 0 %} zerado{% endif %}">{{ v.estoque }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="bloco-nota">Todas as variações têm pelo menos 3 peças.</p>
+  {% endif %}
+</section>
+{% endblock %}

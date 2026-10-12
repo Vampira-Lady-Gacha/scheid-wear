@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{% block titulo %}Painel{% endblock %} · {{ loja.nome_loja }}</title>
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/fontes.css?v={{ VERSAO_ESTATICOS }}">
+  <link rel="stylesheet" href="/static/css/loja.css?v={{ VERSAO_ESTATICOS }}">
+  <link rel="stylesheet" href="/static/css/admin.css?v={{ VERSAO_ESTATICOS }}">
+</head>
+<body class="painel-corpo">
+  {% include "_icones.html" %}
+  {% set caminho = request.url.path %}
+  <div class="painel">
+    <aside class="painel-lado">
+      <a class="painel-marca" href="/admin"><span class="marca-nome">{{ loja.nome_loja }}</span><span class="rotulo-impresso">Painel</span></a>
+      <nav class="painel-nav" aria-label="Painel">
+        <a href="/admin" {% if caminho == '/admin' %}aria-current="page"{% endif %}>Visão geral</a>
+        <a href="/admin/pedidos" {% if caminho.startswith('/admin/pedidos') %}aria-current="page"{% endif %}>Pedidos</a>
+        <a href="/admin/pecas" {% if caminho.startswith('/admin/pecas') %}aria-current="page"{% endif %}>Peças</a>
+        <a href="/admin/categorias" {% if caminho.startswith('/admin/categorias') %}aria-current="page"{% endif %}>Categorias</a>
+        <a href="/admin/cupons" {% if caminho.startswith('/admin/cupons') %}aria-current="page"{% endif %}>Cupons</a>
+        <a href="/admin/configuracoes" {% if caminho.startswith('/admin/configuracoes') %}aria-current="page"{% endif %}>Loja</a>
+      </nav>
+      <div class="painel-rodape">
+        <a href="/" target="_blank" rel="noopener">Ver a loja <svg class="ico" aria-hidden="true"><use href="#i-seta"/></svg></a>
+        <a href="/admin/conta">Minha senha</a>
+        <form method="post" action="/admin/sair"><input type="hidden" name="csrf" value="{{ csrf }}"><button type="submit">Sair</button></form>
+      </div>
+    </aside>
+    <main class="painel-principal">
+      {% if aviso %}<p class="aviso" role="status"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>{{ aviso }}</p>{% endif %}
+      {% block conteudo %}{% endblock %}
+    </main>
+  </div>
+  <script src="/static/js/admin.js?v={{ VERSAO_ESTATICOS }}" defer></script>
+</body>
+</html>

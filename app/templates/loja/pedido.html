@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block titulo %}Pedido {{ pedido.codigo }} · {{ loja.nome_loja }}{% endblock %}
+{% block cabeca %}<meta name="robots" content="noindex">{% endblock %}
+
+{% set etapas = ['aguardando', 'pago', 'enviado', 'entregue'] %}
+{% set atual = etapas.index(pedido.status) if pedido.status in etapas else -1 %}
+
+{% block conteudo %}
+<section class="secao pedido" data-pagina-pedido data-codigo="{{ pedido.codigo }}">
+  <div class="secao-cabeca pedido-cabeca">
+    <h1 class="titulo-secao">Pedido {{ pedido.codigo }}</h1>
+    <p class="texto">
+      {% if pedido.status == 'aguardando' %}Recebemos seu pedido. {% if pix %}Pague o Pix abaixo para garantir as peças.{% else %}Finalize o pagamento pelo WhatsApp.{% endif %}
+      {% elif pedido.status == 'pago' %}Pagamento confirmado. {{ loja.prazo_postagem }}
+      {% elif pedido.status == 'enviado' %}Seu pedido está a caminho.
+      {% elif pedido.status == 'entregue' %}Pedido entregue. Vista o seu movimento.
+      {% else %}Este pedido foi cancelado. Se foi engano, fale com a gente no WhatsApp.{% endif %}
+    </p>
+  </div>
+
+  {% if atual >= 0 %}
+  <ol class="etapas" aria-label="Situação do pedido">
+    {% for e in etapas %}
+    <li class="{% if loop.index0 < atual %}feita{% elif loop.index0 == atual %}atual{% endif %}" {% if loop.index0 == atual %}aria-current="step"{% endif %}>
+      {% if loop.index0 < atual %}<svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>{% endif %}{{ STATUS_PEDIDO[e] }}
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <p class="etapa-cancelada rotulo-impresso">Cancelado</p>
+  {% endif %}
+
+  <div class="pedido-grade">
+    {% if pix %}
+    <div class="pix-tag" data-pix>
+      <p class="pix-faixa"><span class="ao-vivo">Pix pendente</span><b class="num">{{ pedido.total | reais }}</b></p>
+      <div class="pix-corpo">
+        <div class="pix-qr" role="img" aria-label="QR Code do Pix de {{ pedido.total | reais }}">{{ pix.qr | safe }}</div>
+        <ol class="pix-passos">
+          <li>Abra o app do seu banco e escolha pagar com Pix.</li>
+          <li>Leia o QR Code ou cole o código abaixo.</li>
+          <li>Confira o valor de <b class="num">{{ pedido.total | reais }}</b> e o recebedor {{ loja.pix_nome }}.</li>
+        </ol>
+        <label class="pix-codigo">
+          <span class="rotulo-impresso">Pix copia e cola</span>
+          <textarea class="entrada" readonly rows="3" data-pix-codigo>{{ pix.codigo }}</textarea>
+        </label>
+        <button class="botao botao-largo" type="button" data-copiar-pix><svg class="ico" aria-hidden="true"><use href="#i-copiar"/></svg> <span>Copiar código Pix</span></button>
+        <p class="pix-nota">Assim que conferirmos o pagamento, esta página muda para “Pago”. Quer agilizar? <a href="{{ url_whatsapp }}" target="_blank" rel="noopener">Mande o comprovante no WhatsApp</a>.</p>
+      </div>
+    </div>
+    {% elif pedido.status == 'aguardando' %}
+    <div class="pix-tag">
+      <p class="pix-faixa"><span class="ao-vivo">Pagamento pendente</span><b class="num">{{ pedido.total | reais }}</b></p>
+      <div class="pix-corpo">
+        <p>Toque no botão para mandar o pedido pronto no WhatsApp da {{ loja.nome_loja }}. A gente responde com a forma de pagamento.</p>
+        <a class="botao botao-largo" href="{{ url_whatsapp }}" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-zap"/></svg> Enviar pedido no WhatsApp</a>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="comprovante">
+      {% if pedido.rastreio %}
+      <div class="rastreio">
+        <p class="rotulo-impresso">Código de rastreio</p>
+        <p class="rastreio-codigo num">{{ pedido.rastreio }}</p>
+        <a href="https://rastreamento.correios.com.br/app/index.php" target="_blank" rel="noopener">Rastrear nos Correios <svg class="ico" aria-hidden="true"><use href="#i-seta"/></svg></a>
+      </div>
+      {% endif %}
+      <h2 class="rotulo-impresso">Peças</h2>
+      <ul class="comprovante-itens">
+        {% for i in pedido.itens %}
+        <li><span>{{ i.quantidade }}× {{ i.nome }}<small>{{ i.cor }} · {{ i.tamanho }}</small></span><b class="num">{{ i.subtotal | reais }}</b></li>
+        {% endfor %}
+      </ul>
+      <dl class="resumo num">
+        <div><dt>Subtotal</dt><dd>{{ pedido.subtotal | reais }}</dd></div>
+        {% if pedido.desconto %}<div><dt>Cupom {{ pedido.cupom }}</dt><dd>−{{ pedido.desconto | reais }}</dd></div>{% endif %}
+        <div><dt>Frete</dt><dd>{{ (pedido.frete | reais) if pedido.frete else 'Grátis' }}</dd></div>
+        <div class="resumo-total"><dt>Total</dt><dd>{{ pedido.total | reais }}</dd></div>
+      </dl>
+      <h2 class="rotulo-impresso">Entrega</h2>
+      <p class="comprovante-endereco">{{ pedido.nome }}<br>{{ pedido.rua }}, {{ pedido.numero }}{% if pedido.complemento %}, {{ pedido.complemento }}{% endif %}<br>{{ pedido.bairro }} · {{ pedido.cidade }}/{{ pedido.uf }}<br>CEP {{ pedido.cep_fmt }}</p>
+      <p class="comprovante-rodape rotulo-impresso">Feito em {{ pedido.criado_em.strftime('%d/%m/%Y às %H:%M') }} · {{ PAGAMENTOS[pedido.pagamento] }}</p>
+      <p class="comprovante-acoes">
+        <a class="botao botao-linha" href="{{ url_whatsapp }}" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-zap"/></svg> Falar sobre o pedido</a>
+        <a class="link-simples" href="{{ request.url }}">Atualizar situação</a>
+      </p>
+      <p class="pedido-guardar">Guarde este link: é por ele que você acompanha o pedido.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

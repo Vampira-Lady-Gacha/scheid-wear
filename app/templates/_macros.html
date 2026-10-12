@@ -1,0 +1,135 @@
+{# Componentes do Sistema de Etiquetas: tag de papel-cartão, abas de tamanho, etiqueta de lavagem. #}
+
+{% macro preco(peca) -%}
+<p class="preco num">
+  {% if peca.preco_de %}<s><span class="sr">De </span>{{ peca.preco_de | reais }}</s>{% endif %}
+  <b>{% if peca.preco_de %}<span class="sr">por </span>{% endif %}{{ peca.preco | reais }}</b>
+</p>
+{%- endmacro %}
+
+{% macro placa(peca, foto=None, prioridade=False, tamanho='640') -%}
+{% set f = foto or peca.foto_capa %}
+<div class="placa">
+  {% if f %}
+  <img src="/media/{{ f.arquivo }}" alt="{{ peca.nome }}" width="1000" height="1000"
+       {% if prioridade %}fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async" data-foto-principal>
+  {% else %}
+  <span class="placa-vazia">Sem foto</span>
+  {% endif %}
+  {% if peca.esgotada %}<span class="carimbo">Esgotado</span>{% endif %}
+</div>
+{%- endmacro %}
+
+{# Tag pendurada no trilho: a peça na grade #}
+{% macro tag(peca, loja) %}
+{% set disp = peca.tamanhos_disponiveis() %}
+<article class="tag{% if peca.esgotada %} tag-esgotada{% endif %}">
+  <span class="tag-furo" aria-hidden="true"></span>
+  <a class="tag-foto" href="/peca/{{ peca.slug }}" tabindex="-1" aria-hidden="true">{{ placa(peca) }}</a>
+  <div class="tag-corpo">
+    <p class="tag-numero rotulo-impresso"><span>{{ peca.numero_fmt }}</span>{% if peca.drop %}<span>{{ peca.drop }}</span>{% endif %}</p>
+    <h3 class="tag-nome"><a href="/peca/{{ peca.slug }}">{{ peca.nome }}</a></h3>
+    {{ preco(peca) }}
+    <p class="tag-tamanhos" aria-label="Tamanhos disponíveis">
+      {% for t in peca.tamanhos %}<span{% if t not in disp %} class="fora"{% endif %}>{{ t }}{% if t not in disp %}<span class="sr"> esgotado</span>{% endif %}</span>{% endfor %}
+    </p>
+  </div>
+</article>
+{% endmacro %}
+
+{% macro abas_tamanho(peca, nome='tamanho') %}
+{% set disp = peca.tamanhos_disponiveis() %}
+<fieldset class="abas">
+  <legend class="rotulo-impresso">Tamanho</legend>
+  <div class="abas-lista">
+    {% for t in peca.tamanhos %}
+    <span class="aba">
+      <input type="radio" name="{{ nome }}" id="{{ nome }}-{{ peca.id }}-{{ loop.index }}" value="{{ t }}" {% if t not in disp %}disabled{% endif %} {% if peca.tamanhos | length == 1 and t in disp %}checked{% endif %} data-tamanho>
+      <label for="{{ nome }}-{{ peca.id }}-{{ loop.index }}">{{ t }}{% if t not in disp %}<span class="sr"> (esgotado)</span>{% endif %}</label>
+    </span>
+    {% endfor %}
+  </div>
+</fieldset>
+{% endmacro %}
+
+{% macro amostras_cor(peca, nome='cor') %}
+{% if peca.cores | length > 1 %}
+<fieldset class="amostras">
+  <legend class="rotulo-impresso">Cor · <span data-cor-nome>{{ peca.cores[0][0] }}</span></legend>
+  <div class="amostras-lista">
+    {% for cor, hexa in peca.cores %}
+    <span class="amostra">
+      <input type="radio" name="{{ nome }}" id="{{ nome }}-{{ peca.id }}-{{ loop.index }}" value="{{ cor }}" {% if loop.first %}checked{% endif %} data-cor>
+      <label for="{{ nome }}-{{ peca.id }}-{{ loop.index }}" style="--amostra: {{ hexa }}"><span class="sr">{{ cor }}</span></label>
+    </span>
+    {% endfor %}
+  </div>
+</fieldset>
+{% else %}
+{% for cor, hexa in peca.cores %}
+<input type="hidden" name="{{ nome }}" value="{{ cor }}" data-cor-unica>
+<p class="rotulo-impresso cor-unica"><i style="--amostra: {{ hexa }}" aria-hidden="true"></i>Cor · {{ cor }}</p>
+{% endfor %}
+{% endif %}
+{% endmacro %}
+
+{# Formulário de compra: variantes em JSON para o JS escolher a variante pelo par cor + tamanho #}
+{% macro form_compra(peca, quantidade=True) %}
+<form class="compra" data-compra>
+  <script type="application/json" data-grade>{{ peca.variantes_json | tojson }}</script>
+  {{ amostras_cor(peca) }}
+  {{ abas_tamanho(peca) }}
+  <p class="estoque-aviso" data-estoque-aviso aria-live="polite"></p>
+  {% if peca.esgotada %}
+  <p class="botao botao-largo desligado" aria-disabled="true">Esgotado</p>
+  {% else %}
+  <div class="linha-acao">
+    {% if quantidade %}
+    <div class="qtd">
+      <button type="button" data-menos aria-label="Diminuir quantidade"><svg class="ico" aria-hidden="true"><use href="#i-menos"/></svg></button>
+      <input type="number" inputmode="numeric" min="1" max="10" value="1" aria-label="Quantidade" data-quantidade>
+      <button type="button" data-mais aria-label="Aumentar quantidade"><svg class="ico" aria-hidden="true"><use href="#i-mais"/></svg></button>
+    </div>
+    {% endif %}
+    <button class="botao botao-largo" type="submit">Adicionar à sacola</button>
+  </div>
+  {% endif %}
+  <p class="confirma" data-confirma role="status"></p>
+</form>
+{% endmacro %}
+
+{# Etiqueta de lavagem: cetim impresso com material e símbolos #}
+{% macro etiqueta_lavagem(peca) %}
+{% if peca.material or peca.lista_cuidados %}
+<section class="lavagem" aria-labelledby="lavagem-{{ peca.id }}">
+  <h2 class="rotulo-impresso" id="lavagem-{{ peca.id }}">Composição e cuidados</h2>
+  {% if peca.material %}<p class="lavagem-material">{{ peca.material }}</p>{% endif %}
+  {% if peca.lista_cuidados %}
+  <ul class="lavagem-simbolos">
+    {% for c in peca.lista_cuidados if c in CUIDADOS %}
+    <li><svg class="simbolo" aria-hidden="true"><use href="#c-{{ c }}"/></svg><span>{{ CUIDADOS[c] }}</span></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  <p class="lavagem-rodape rotulo-impresso">{{ peca.numero_fmt }}{% if peca.drop %} · {{ peca.drop }}{% endif %} · {{ loja.nome_loja }}</p>
+</section>
+{% endif %}
+{% endmacro %}
+
+{% macro tabela_medidas(peca) %}
+{% set t = peca.tabela_medidas %}
+{% if t %}
+<details class="medidas">
+  <summary><svg class="ico" aria-hidden="true"><use href="#i-regua"/></svg> Tabela de medidas</summary>
+  <div class="medidas-rolagem">
+    <table>
+      <thead><tr>{% for c in t[0] %}<th scope="col">{{ c }}</th>{% endfor %}</tr></thead>
+      <tbody>
+        {% for linha in t[1:] %}<tr>{% for c in linha %}{% if loop.first %}<th scope="row">{{ c }}</th>{% else %}<td>{{ c }}</td>{% endif %}{% endfor %}</tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p>Medidas da peça estendida, em centímetros. Compare com uma peça que você já usa.</p>
+</details>
+{% endif %}
+{% endmacro %}

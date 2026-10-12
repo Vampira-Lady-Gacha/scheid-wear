@@ -1,0 +1,130 @@
+{
+  "title": "Escolha o mundo visual da SCHEID",
+  "question": "O sorteio escolheu o Sistema de Etiquetas. Fique com ele, pegue uma alternativa ou sorteie de novo.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Sistema de Etiquetas",
+      "kicker": "THE ROLL",
+      "lineage": "tag de papelão, etiqueta tecida, etiqueta de lavagem e tag de tamanho de uma peça de streetwear",
+      "thesis": "A loja inteira é o kit de etiquetas de uma peça SCHEID: cada tela é uma tag que você lê, escolhe e destaca.",
+      "palette": ["#0c0c0d", "#f1f0ec", "#8a8a86", "#ff5b1a"],
+      "materials": ["papel-cartão com ilhós", "etiqueta tecida preta", "cetim impresso de lavagem", "pino de tag"],
+      "viewport": "DROP 001 — AFTER HOURS tecido como etiqueta gigante no topo; a peça do drop ocupa a tela e a tag dela pendura no viewport com preço, abas de tamanho e o botão de adicionar à sacola na própria tag.",
+      "risk": "Etiqueta como design é território conhecido do streetwear; vira citação se aparecer aspas irônicas ou abraçadeira. Tem de ser SCHEID, não homenagem.",
+      "raised": [
+        {"from": "challenger-raku", "raise": "Laranja só para o que está quente: drop ao vivo, tamanho escolhido, Pix pendente. Nada mais ganha cor."},
+        {"from": "challenger-hypercard", "raise": "Estado por inversão: tamanho, filtro e botão ativos viram bloco preto sólido, sem cinzas intermediários."},
+        {"from": "challenger-timetable", "raise": "Uma placa invertida por tela: só um elemento por viewport vira etiqueta tecida preta."},
+        {"from": "challenger-loteria", "raise": "Toda peça nomeada e numerada no mesmo traço (Nº 001), foto nunca cortada."}
+      ]
+    },
+    {
+      "id": "model-pick",
+      "label": "Quadra Depois da Meia-Noite",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "quadra poliesportiva de bairro sob refletor de vapor de sódio",
+      "thesis": "As linhas pintadas da quadra são o grid da loja; o drop entra em campo depois que as luzes da rua acendem.",
+      "palette": ["#14211c", "#f4f1e8", "#e9b43a", "#c8452d"],
+      "materials": ["piso de concreto pintado", "fita de demarcação", "placar de ginásio", "luz de sódio"],
+      "viewport": "Meia quadra vista de cima: o círculo central abriga a peça do drop, a linha de fundo é a navegação e o placar mostra preço e contagem do drop.",
+      "risk": "Esporte + noite é onde muitas lojas de streetwear chegam; o verde de quadra pode brigar com a marca preta e branca."
+    },
+    {
+      "id": "challenger-hypercard",
+      "label": "Pilha HyperCard",
+      "verdict": "declined",
+      "lineage": "pilha de cartões HyperCard em 1 bit",
+      "thesis": "Cartões preto e branco ligados por botões pintados à mão.",
+      "palette": ["#000000", "#ffffff"],
+      "materials": ["pontilhado 1 bit", "bordas desenhadas"],
+      "viewport": "Um cartão fixo por peça, botões pintados para navegar.",
+      "case": "Funde mal: o público do drop não se reconhece num software de 1987, e o carrinho perde clareza.",
+      "kept": "Compromisso total com 1 bit: estado ativo como inversão sólida.",
+      "risk": "Nostalgia de computador, nada de rua.",
+      "hero": "https://impeccable.style/worlds/cards/medium-native-hypercard-stack-shoebox-hero.webp"
+    },
+    {
+      "id": "challenger-collider",
+      "label": "Display de Colisor",
+      "verdict": "declined",
+      "lineage": "visualização de eventos de detector de partículas",
+      "thesis": "Um evento congelado no centro, trilhas saindo em anéis.",
+      "palette": ["#07090c", "#5d7a99", "#f2d230", "#e0332b"],
+      "materials": ["vácuo", "anéis de detector"],
+      "viewport": "A peça como colisão no centro, dados em anéis.",
+      "case": "Funde mal: ciência não é a cultura da marca; a compra vira enigma.",
+      "kept": "Um evento por vez: o drop atual segura a tela inteira.",
+      "risk": "Frio e técnico demais para moda.",
+      "hero": "https://impeccable.style/worlds/cards/scientific-notation-particle-detector-event-display-hero.webp"
+    },
+    {
+      "id": "challenger-raku",
+      "label": "Queima Raku",
+      "verdict": "declined",
+      "lineage": "cerâmica raku tirada do forno para a fumaça",
+      "thesis": "Barro carbonizado, esmalte craquelado, brasa só no vaso quente.",
+      "palette": ["#141210", "#d9d6cf", "#ff6a1f"],
+      "materials": ["argila fumada", "esmalte craquelado"],
+      "viewport": "A peça como vaso em brasa sobre fundo de fuligem.",
+      "case": "Funde mal: artesanato cerâmico não fala com streetwear.",
+      "kept": "Cor reservada só para o que está quente agora.",
+      "risk": "Artesanal e lento demais para drop.",
+      "hero": "https://impeccable.style/worlds/cards/clay-ceramics-fracture-raku-smoke-flash-hero.webp"
+    },
+    {
+      "id": "challenger-loteria",
+      "label": "Noite de Lotería",
+      "verdict": "declined",
+      "lineage": "cartas numeradas da lotería mexicana",
+      "thesis": "Cartas de ícone numeradas em cor de quermesse.",
+      "palette": ["#f3c623", "#e2557b", "#2cb1a6", "#c21f2b"],
+      "materials": ["cartela impressa", "feijão marcador"],
+      "viewport": "O drop como baralho, a sacola como tabla.",
+      "case": "Funde mal: vernáculo de outra cultura, cores fora da marca.",
+      "kept": "Cada peça nomeada e numerada no mesmo traço.",
+      "risk": "Fantasia de festa, não de rua.",
+      "hero": "https://impeccable.style/worlds/cards/vernacular-ephemera-loteria-tabla-night-hero.webp"
+    },
+    {
+      "id": "challenger-timetable",
+      "label": "Horário de Voo em Lâminas",
+      "verdict": "declined",
+      "lineage": "horário de bolso de companhia aérea, 1971",
+      "thesis": "Um só tamanho de letra; hierarquia por peso, caixa e inversão.",
+      "palette": ["#d9a521", "#1d1d1b", "#f1ead6", "#d4402b"],
+      "materials": ["vidro tingido", "mesa de luz"],
+      "viewport": "Lâminas inclinadas com peças em colunas de horário.",
+      "case": "Funde mal: inclinação e tamanho único atrapalham foto e preço no celular.",
+      "kept": "Uma única placa invertida por tela.",
+      "risk": "Bonito e ilegível para compra rápida.",
+      "hero": "https://impeccable.style/worlds/cards/rw-timetable-slide-rack-hero.webp"
+    },
+    {
+      "id": "challenger-canopy",
+      "label": "Toldo de Seda",
+      "verdict": "declined",
+      "lineage": "faixas de seda translúcida sobre pátio",
+      "thesis": "Faixas coloridas se cruzando em acordes de cor.",
+      "palette": ["#2b3a8c", "#9c2f2f", "#e6a91a", "#fafaf7"],
+      "materials": ["seda translúcida", "pátio ao sol"],
+      "viewport": "Faixas de categoria se sobrepondo.",
+      "case": "Funde mal: luz do dia e seda contra uma marca preta e noturna.",
+      "kept": "Estados rotulados além da cor.",
+      "risk": "Delicado demais para a marca.",
+      "hero": "https://impeccable.style/worlds/cards/generative-art-computational-color-chord-counterpoint-hero.webp"
+    }
+  ],
+  "reroll": {"registers": ["safer", "bolder"]},
+  "buildPath": {"value": "code", "toggle": false},
+  "canon": true,
+  "canonCard": {
+    "label": "O padrão da categoria",
+    "thesis": "Loja de streetwear preta com grid de produtos, executada com capricho.",
+    "palette": ["#000000", "#ffffff", "#e10600"],
+    "materials": ["grid limpo", "foto de produto"],
+    "viewport": "Logo no topo, banner do drop, grade de peças em quatro colunas.",
+    "risk": "Igual a qualquer outra loja de drop por definição."
+  },
+  "steer": true
+}

@@ -1,0 +1,32 @@
+{% extends "admin/base.html" %}
+{% block titulo %}Loja{% endblock %}
+
+{% block conteudo %}
+<div class="painel-cabeca"><h1>Dados da loja</h1></div>
+
+<form method="post" action="/admin/configuracoes">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  {% for grupo, campos in grupos.items() %}
+  <section class="bloco">
+    <h2>{{ grupo }}</h2>
+    {% if grupo == 'Pix' %}<p class="bloco-nota">Sem chave Pix, o cliente fecha o pedido e é levado ao WhatsApp para pagar. Com a chave, o site gera o QR Code com o valor exato de cada pedido.</p>{% endif %}
+    {% if grupo == 'Frete' %}<p class="bloco-nota">O frete é o mesmo para todo o Brasil. Deixe “frete grátis a partir de” vazio para nunca dar frete grátis.</p>{% endif %}
+    <div class="form-grade">
+      {% for chave, rotulo in campos.items() %}
+        {% if chave.startswith('texto_') or chave == 'drop_texto' %}
+        <label class="campo inteiro"><span>{{ rotulo }}</span><textarea class="entrada" name="{{ chave }}" rows="3">{{ loja[chave] }}</textarea></label>
+        {% elif chave == 'whatsapp' %}
+        <label class="campo"><span>{{ rotulo }}</span><input class="entrada" name="{{ chave }}" inputmode="tel" value="{{ loja[chave] }}" placeholder="5511999999999">
+          <small><a href="{{ link_whatsapp(loja.whatsapp, 'Teste do site') }}" target="_blank" rel="noopener">Testar o número no WhatsApp</a></small></label>
+        {% elif chave in ('frete_fixo', 'frete_gratis_acima') %}
+        <label class="campo"><span>{{ rotulo }}</span><input class="entrada" name="{{ chave }}" inputmode="decimal" value="{{ loja[chave] }}" placeholder="0,00"></label>
+        {% else %}
+        <label class="campo"><span>{{ rotulo }}</span><input class="entrada" name="{{ chave }}" value="{{ loja[chave] }}"></label>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+  <p class="bloco-acoes fixo"><button class="botao" type="submit">Salvar tudo</button></p>
+</form>
+{% endblock %}

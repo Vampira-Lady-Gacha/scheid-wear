@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m with context %}
+
+{% block titulo %}{{ peca.nome }} · {{ loja.nome_loja }}{% endblock %}
+{% block descricao %}{{ peca.nome }} por {{ peca.preco | reais }}. {{ peca.descricao[:140] }}{% endblock %}
+{% block og_imagem %}{% if peca.foto_capa %}<meta property="og:image" content="{{ url_publica }}/media/{{ peca.foto_capa.arquivo }}">{% else %}{{ super() }}{% endif %}{% endblock %}
+{% block cabeca %}
+<script type="application/ld+json">{{ {
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": peca.nome,
+  "description": peca.descricao,
+  "image": [url_publica ~ "/media/" ~ peca.foto_capa.arquivo] if peca.foto_capa else [],
+  "brand": {"@type": "Brand", "name": loja.nome_loja},
+  "offers": {
+    "@type": "Offer",
+    "priceCurrency": "BRL",
+    "price": "%.2f" | format(peca.preco / 100),
+    "availability": "https://schema.org/OutOfStock" if peca.esgotada else "https://schema.org/InStock",
+    "url": url_publica ~ "/peca/" ~ peca.slug
+  }
+} | tojson }}</script>
+{% endblock %}
+
+{% block conteudo %}
+<nav class="trilha" aria-label="Você está em">
+  <a href="/catalogo">Catálogo</a>
+  {% if peca.categoria %}<span aria-hidden="true">/</span><a href="/catalogo?categoria={{ peca.categoria.slug }}">{{ peca.categoria.nome }}</a>{% endif %}
+  <span aria-hidden="true">/</span><span aria-current="page">{{ peca.nome }}</span>
+</nav>
+
+<article class="peca-pagina">
+  <div class="galeria">
+    {{ m.placa(peca, prioridade=True) }}
+    {% if peca.fotos | length > 1 %}
+    <div class="miniaturas" role="group" aria-label="Fotos da peça">
+      {% for f in peca.fotos %}
+      <button type="button" data-miniatura="/media/{{ f.arquivo }}" aria-pressed="{{ 'true' if loop.first else 'false' }}" aria-label="Foto {{ loop.index }} de {{ peca.fotos | length }}">
+        <img src="/media/{{ f.arquivo }}" alt="" loading="lazy" width="120" height="120">
+      </button>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="peca-lado">
+    <div class="tag-pendurada" data-tag-balanca>
+      <article class="tag tag-grande peca-destaque" aria-labelledby="peca-nome">
+        <span class="tag-furo" aria-hidden="true"></span>
+        <div class="tag-corpo">
+          <p class="tag-numero rotulo-impresso"><span>{{ peca.numero_fmt }}</span>{% if peca.drop %}<span>{{ peca.drop }}</span>{% endif %}{% if peca.categoria %}<span>{{ peca.categoria.nome }}</span>{% endif %}</p>
+          <h1 class="tag-nome" id="peca-nome">{{ peca.nome }}</h1>
+          {{ m.preco(peca) }}
+          <p class="parcela">no Pix · frete R$ {{ loja.frete_fixo }}{% if loja.frete_gratis_acima %}, grátis acima de R$ {{ loja.frete_gratis_acima }}{% endif %}</p>
+          <div data-compra-ancora>{{ m.form_compra(peca) }}</div>
+          {{ m.tabela_medidas(peca) }}
+        </div>
+      </article>
+    </div>
+
+    {% if peca.descricao %}
+    <div class="peca-texto">
+      <h2 class="rotulo-impresso">Sobre a peça</h2>
+      <p>{{ peca.descricao }}</p>
+    </div>
+    {% endif %}
+    {{ m.etiqueta_lavagem(peca) }}
+    <p class="peca-ajuda"><a href="{{ link_whatsapp(loja.whatsapp, 'Oi! Tenho uma dúvida sobre a peça ' ~ peca.nome ~ ' (' ~ peca.numero_fmt ~ ').') }}" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-zap"/></svg> Dúvida de tamanho? Chame no WhatsApp</a></p>
+  </div>
+</article>
+
+{% if outras %}
+<section class="secao trilho-secao" aria-labelledby="outras-titulo">
+  <div class="secao-cabeca"><h2 class="titulo-secao" id="outras-titulo">Também no drop</h2></div>
+  <div class="trilho">
+    {% for p in outras %}{{ m.tag(p, loja) }}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if not peca.esgotada %}
+<div class="barra-celular" data-barra-celular>
+  <div><b>{{ peca.preco | reais }}</b><span>{{ peca.nome }}</span></div>
+  <a class="botao" href="#conteudo" data-ir-compra>Escolher tamanho</a>
+</div>
+{% endif %}
+{% endblock %}

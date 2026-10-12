@@ -1,0 +1,32 @@
+{% extends "admin/base.html" %}
+{% block titulo %}Categorias{% endblock %}
+
+{% block conteudo %}
+<div class="painel-cabeca"><h1>Categorias</h1></div>
+
+<form class="bloco" method="post" action="/admin/categorias">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <p class="bloco-nota">Categorias sem peças à venda não aparecem no catálogo da loja.</p>
+  <div class="tabela-rolagem">
+    <table class="tabela">
+      <thead><tr><th>Nome</th><th>Ordem</th><th class="dir">Peças</th><th>Ativa</th><th>Apagar</th></tr></thead>
+      <tbody>
+        {% for c in categorias %}
+        <tr>
+          <td><input class="entrada" name="nome-{{ c.id }}" value="{{ c.nome }}" maxlength="80" aria-label="Nome"></td>
+          <td class="col-curta"><input class="entrada" type="number" name="ordem-{{ c.id }}" value="{{ c.ordem }}" aria-label="Ordem de {{ c.nome }}"></td>
+          <td class="dir">{{ contagem.get(c.id, 0) }}</td>
+          <td><label class="marcar"><input type="checkbox" name="ativa-{{ c.id }}" {% if c.ativa %}checked{% endif %} aria-label="{{ c.nome }} ativa"></label></td>
+          <td><label class="marcar"><input type="checkbox" name="apagar-{{ c.id }}" aria-label="Apagar {{ c.nome }}"></label></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="vazio-celula">Nenhuma categoria ainda.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <label class="campo estreito-campo"><span>Nova categoria</span>
+    <input class="entrada" name="nova" maxlength="80" placeholder="Ex.: Calças"></label>
+  <p class="bloco-acoes"><button class="botao" type="submit">Salvar categorias</button></p>
+</form>
+{% endblock %}

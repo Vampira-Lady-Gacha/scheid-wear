@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block titulo %}Sacola · {{ loja.nome_loja }}{% endblock %}
+{% block cabeca %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block conteudo %}
+<section class="secao sacola" data-pagina-sacola>
+  <div class="secao-cabeca">
+    <h1 class="titulo-secao">Sacola</h1>
+  </div>
+
+  <p class="carregando-linha" data-carregando><span class="carregando" aria-hidden="true"></span> Conferindo preços e estoque…</p>
+
+  <div class="vazio" data-vazio hidden>
+    <p class="titulo-vazio">Sua sacola está vazia.</p>
+    <p>Escolha o tamanho na tag da peça e toque em “Adicionar à sacola”.</p>
+    <p><a class="botao" href="/">Ver o {{ loja.drop_codigo }}</a></p>
+  </div>
+
+  <div class="sacola-grade" data-cheio hidden>
+    <div class="sacola-itens">
+      <h2 class="rotulo-impresso">Peças <span data-qtd-total></span></h2>
+      <ul class="linhas" data-linhas></ul>
+      <template data-modelo-linha>
+        <li class="linha">
+          <a class="linha-foto" data-l-link tabindex="-1" aria-hidden="true"><img data-l-foto alt="" width="120" height="120"></a>
+          <div class="linha-info">
+            <p class="rotulo-impresso" data-l-numero></p>
+            <a class="linha-nome" data-l-link data-l-nome></a>
+            <p class="linha-var"><i data-l-amostra aria-hidden="true"></i><span data-l-cor></span> · <span data-l-tam></span></p>
+            <p class="linha-alerta" data-l-alerta hidden></p>
+          </div>
+          <div class="linha-qtd">
+            <div class="qtd pequena">
+              <button type="button" data-l-menos aria-label="Diminuir"><svg class="ico" aria-hidden="true"><use href="#i-menos"/></svg></button>
+              <input type="number" inputmode="numeric" min="0" max="99" aria-label="Quantidade" data-l-qtd>
+              <button type="button" data-l-mais aria-label="Aumentar"><svg class="ico" aria-hidden="true"><use href="#i-mais"/></svg></button>
+            </div>
+            <button type="button" class="linha-tirar" data-l-tirar>Tirar</button>
+          </div>
+          <p class="linha-preco num"><b data-l-subtotal></b><span data-l-unit></span></p>
+        </li>
+      </template>
+
+      <form class="cupom" data-form-cupom>
+        <label for="cupom" class="rotulo-impresso">Cupom</label>
+        <div class="cupom-linha">
+          <input class="entrada" id="cupom" name="cupom" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Código do cupom" maxlength="30">
+          <button class="botao botao-linha" type="submit">Aplicar</button>
+        </div>
+        <p class="cupom-retorno" data-cupom-retorno role="status"></p>
+      </form>
+    </div>
+
+    <form class="envio" data-form-envio novalidate>
+      <div class="envio-etiqueta">
+        <header class="envio-cabeca">
+          <p class="rotulo-impresso">Etiqueta de envio</p>
+          <p class="rotulo-impresso">Remetente: {{ loja.nome_loja }}</p>
+        </header>
+
+        <fieldset class="envio-bloco">
+          <legend class="rotulo-impresso">Destinatário</legend>
+          <label class="campo inteiro"><span>Nome e sobrenome</span>
+            <input class="entrada" name="nome" autocomplete="name" required maxlength="120"></label>
+          <label class="campo"><span>WhatsApp</span>
+            <input class="entrada" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="(11) 90000-0000" required maxlength="30" data-mascara-tel></label>
+          <label class="campo"><span>E-mail <small>(opcional)</small></span>
+            <input class="entrada" name="email" type="email" autocomplete="email" maxlength="160"></label>
+        </fieldset>
+
+        <fieldset class="envio-bloco">
+          <legend class="rotulo-impresso">Endereço</legend>
+          <label class="campo campo-cep"><span>CEP</span>
+            <input class="entrada" name="cep" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000" required maxlength="9" data-cep>
+            <small data-cep-retorno aria-live="polite"><a href="https://buscacepinter.correios.com.br/app/endereco/index.php" target="_blank" rel="noopener">Não sei meu CEP</a></small></label>
+          <label class="campo inteiro"><span>Rua</span>
+            <input class="entrada" name="rua" autocomplete="address-line1" required maxlength="160"></label>
+          <label class="campo"><span>Número</span>
+            <input class="entrada" name="numero" required maxlength="20" placeholder="Ex.: 120 ou S/N"></label>
+          <label class="campo"><span>Complemento <small>(opcional)</small></span>
+            <input class="entrada" name="complemento" autocomplete="address-line2" maxlength="80"></label>
+          <label class="campo"><span>Bairro</span>
+            <input class="entrada" name="bairro" required maxlength="80"></label>
+          <label class="campo"><span>Cidade</span>
+            <input class="entrada" name="cidade" autocomplete="address-level2" required maxlength="80"></label>
+          <label class="campo campo-uf"><span>Estado</span>
+            <select class="entrada" name="uf" autocomplete="address-level1" required>
+              <option value="">UF</option>
+              {% for uf in UFS %}<option value="{{ uf }}">{{ uf }}</option>{% endfor %}
+            </select></label>
+          <label class="campo inteiro"><span>Observação <small>(opcional)</small></span>
+            <input class="entrada" name="observacao" maxlength="300" placeholder="Ponto de referência, horário para entrega…"></label>
+        </fieldset>
+
+        <fieldset class="envio-bloco pagamento">
+          <legend class="rotulo-impresso">Pagamento</legend>
+          <label class="opcao">
+            <input type="radio" name="pagamento" value="pix" checked>
+            <span><b><svg class="ico" aria-hidden="true"><use href="#i-qr"/></svg> Pix</b> QR Code e copia-e-cola na próxima tela, com o valor exato.</span>
+          </label>
+          <label class="opcao">
+            <input type="radio" name="pagamento" value="whatsapp">
+            <span><b><svg class="ico" aria-hidden="true"><use href="#i-zap"/></svg> Combinar no WhatsApp</b> O pedido vai pronto para a conversa com a loja.</span>
+          </label>
+        </fieldset>
+
+        <dl class="resumo num">
+          <div><dt>Subtotal</dt><dd data-subtotal></dd></div>
+          <div data-linha-desconto hidden><dt>Cupom <span data-cupom-nome></span></dt><dd data-desconto></dd></div>
+          <div><dt>Frete</dt><dd data-frete></dd></div>
+          <div class="resumo-total"><dt>Total</dt><dd data-total></dd></div>
+        </dl>
+        <p class="frete-falta" data-frete-falta hidden></p>
+
+        <p class="erro-form" data-erro role="alert"></p>
+        <button class="botao botao-largo botao-grande" type="submit" data-enviar>Fechar pedido</button>
+        <p class="envio-nota"><svg class="ico" aria-hidden="true"><use href="#i-cadeado"/></svg> Seus dados servem só para entregar o pedido.</p>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

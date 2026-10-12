@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block titulo %}Ajuda · {{ loja.nome_loja }}{% endblock %}
+{% block descricao %}Como comprar na {{ loja.nome_loja }}: pagamento por Pix, envio para todo o Brasil, trocas e tabela de medidas.{% endblock %}
+
+{% block conteudo %}
+<section class="secao ajuda">
+  <div class="secao-cabeca">
+    <h1 class="titulo-secao">Ajuda</h1>
+    <p class="texto">Tudo o que costuma aparecer no direct, respondido de uma vez. Não achou? Chame no <a href="{{ link_whatsapp(loja.whatsapp, 'Oi! Tenho uma dúvida.') }}" target="_blank" rel="noopener">WhatsApp</a>.</p>
+  </div>
+
+  <div class="ajuda-grade">
+    <nav class="ajuda-indice" aria-label="Assuntos">
+      <a href="#comprar">Como comprar</a>
+      <a href="#pagamento">Pagamento</a>
+      <a href="#envio">Envio e prazos</a>
+      <a href="#trocas">Trocas e devoluções</a>
+      <a href="#tamanhos">Tamanhos</a>
+    </nav>
+
+    <div class="ajuda-texto">
+      <section id="comprar">
+        <h2>Como comprar</h2>
+        <ol class="lista-passos">
+          <li>Na tag da peça, escolha o tamanho e toque em <b>Adicionar à sacola</b>.</li>
+          <li>Na sacola, informe o CEP: o endereço aparece sozinho. Confira e complete o número.</li>
+          <li>Se tiver cupom, aplique antes de fechar. O frete e o total aparecem na hora.</li>
+          <li>Toque em <b>Fechar pedido</b>. A próxima tela traz o QR Code do Pix e o link para acompanhar o pedido.</li>
+        </ol>
+      </section>
+      <section id="pagamento">
+        <h2>Pagamento</h2>
+        <p>{{ loja.texto_pagamento }}</p>
+        <p>Prefere conversar antes? Escolha <b>Combinar no WhatsApp</b> na sacola e o pedido chega pronto para a loja.</p>
+      </section>
+      <section id="envio">
+        <h2>Envio e prazos</h2>
+        <p>{{ loja.texto_envio }}</p>
+        <p>Frete fixo de R$ {{ loja.frete_fixo }} para qualquer lugar do Brasil{% if loja.frete_gratis_acima %}, e grátis em compras a partir de R$ {{ loja.frete_gratis_acima }}{% endif %}. {{ loja.prazo_postagem }}</p>
+      </section>
+      <section id="trocas">
+        <h2>Trocas e devoluções</h2>
+        <p>{{ loja.texto_trocas }}</p>
+      </section>
+      <section id="tamanhos">
+        <h2>Tamanhos</h2>
+        <p>Cada peça tem a própria tabela de medidas, em centímetros, logo abaixo do botão de compra. Meça uma peça sua que veste bem, estendida numa superfície lisa, e compare a largura (de axila a axila) e o comprimento (do ombro à barra).</p>
+        <p>As modelagens oversized são largas de propósito. Se você gosta de roupa mais justa, considere um tamanho abaixo.</p>
+      </section>
+    </div>
+  </div>
+</section>
+{% endblock %}
