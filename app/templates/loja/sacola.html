@@ -17,6 +17,12 @@
     <p><a class="botao" href="/">Ver o {{ loja.drop_codigo }}</a></p>
   </div>
 
+  <div class="vazio" data-enviado hidden>
+    <p class="titulo-vazio">Pedido pronto no WhatsApp.</p>
+    <p>Se o WhatsApp não abriu, toque no botão abaixo. A {{ loja.nome_loja }} responde com o Pix e o prazo de envio.</p>
+    <p><a class="botao" data-link-enviado href="#" target="_blank" rel="noopener">Abrir WhatsApp</a></p>
+  </div>
+
   <div class="sacola-grade" data-cheio hidden>
     <div class="sacola-itens">
       <h2 class="rotulo-impresso">Peças <span data-qtd-total></span></h2>
@@ -42,6 +48,7 @@
         </li>
       </template>
 
+      {% if not estatico %}
       <form class="cupom" data-form-cupom>
         <label for="cupom" class="rotulo-impresso">Cupom</label>
         <div class="cupom-linha">
@@ -50,6 +57,7 @@
         </div>
         <p class="cupom-retorno" data-cupom-retorno role="status"></p>
       </form>
+      {% endif %}
     </div>
 
     <form class="envio" data-form-envio novalidate>
@@ -93,6 +101,13 @@
             <input class="entrada" name="observacao" maxlength="300" placeholder="Ponto de referência, horário para entrega…"></label>
         </fieldset>
 
+        {% if estatico %}
+        <div class="envio-bloco pagamento">
+          <input type="hidden" name="pagamento" value="whatsapp">
+          <p class="rotulo-impresso">Pagamento</p>
+          <p class="opcao-nota"><svg class="ico" aria-hidden="true"><use href="#i-zap"/></svg> O pedido vai pronto para o WhatsApp da {{ loja.nome_loja }}, que responde com o Pix para pagamento.</p>
+        </div>
+        {% else %}
         <fieldset class="envio-bloco pagamento">
           <legend class="rotulo-impresso">Pagamento</legend>
           <label class="opcao">
@@ -105,6 +120,7 @@
           </label>
         </fieldset>
 
+        {% endif %}
         <dl class="resumo num">
           <div><dt>Subtotal</dt><dd data-subtotal></dd></div>
           <div data-linha-desconto hidden><dt>Cupom <span data-cupom-nome></span></dt><dd data-desconto></dd></div>
@@ -114,7 +130,7 @@
         <p class="frete-falta" data-frete-falta hidden></p>
 
         <p class="erro-form" data-erro role="alert"></p>
-        <button class="botao botao-largo botao-grande" type="submit" data-enviar>Fechar pedido</button>
+        <button class="botao botao-largo botao-grande" type="submit" data-enviar>{{ "Enviar pedido no WhatsApp" if estatico else "Fechar pedido" }}</button>
         <p class="envio-nota"><svg class="ico" aria-hidden="true"><use href="#i-cadeado"/></svg> Seus dados servem só para entregar o pedido.</p>
       </div>
     </form>

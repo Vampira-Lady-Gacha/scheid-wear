@@ -10,6 +10,9 @@
   const CHAVE = "scheid-sacola";
   const CHAVE_DADOS = "scheid-entrega";
   const reduzMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const BASE = document.documentElement.dataset.base || "";
+  // Versão estática (GitHub Pages): sem servidor, os dados das peças vêm embutidos na página.
+  const ESTATICO = window.SCHEID || null;
 
   // ------------------------------------------------------------ sacola (localStorage)
 
@@ -174,7 +177,7 @@
       balancar(form);
       confirma.classList.remove("erro");
       confirma.textContent = "";
-      recado(`${qtd > 1 ? qtd + " peças" : "Peça"} na sacola · ${v.cor} · ${v.tamanho}`, { href: "/sacola", texto: "Ver sacola" });
+      recado(`${qtd > 1 ? qtd + " peças" : "Peça"} na sacola · ${v.cor} · ${v.tamanho}`, { href: `${BASE}/sacola`, texto: "Ver sacola" });
     });
 
     refletirCor();
@@ -218,6 +221,50 @@
   }
 
   const soDigitos = (t) => (t || "").replace(/\D/g, "");
+
+  const reais = (c) => "R$ " + (c / 100).toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  const centavos = (texto) => {
+    const t = (texto || "").replace("R$", "").trim();
+    if (!t) return null;
+    return Math.round(parseFloat(t.includes(",") ? t.replace(/\./g, "").replace(",", ".") : t) * 100);
+  };
+
+  function cotarLocal(itens) {
+    const variantes = ESTATICO.dados.variantes;
+    const linhas = [];
+    const removidos = [];
+    for (const { v, q } of itens) {
+      const d = variantes[v];
+      if (!d) { removidos.push(v); continue; }
+      const qtd = Math.min(q, 99);
+      linhas.push({
+        variante_id: v, peca: d.peca, numero: d.numero, slug: d.slug, foto: d.foto, cor: d.cor, cor_hex: d.cor_hex,
+        tamanho: d.tamanho, quantidade: qtd, disponivel: d.estoque, preco: d.preco,
+        preco_fmt: reais(d.preco), subtotal_fmt: reais(d.preco * qtd),
+      });
+    }
+    const subtotal = linhas.reduce((s, l) => s + l.preco * l.quantidade, 0);
+    const fixo = centavos(ESTATICO.loja.frete_fixo) || 0;
+    const gratis = centavos(ESTATICO.loja.frete_gratis_acima);
+    const frete = linhas.length && !(gratis && subtotal >= gratis) ? fixo : 0;
+    return {
+      linhas, removidos, quantidade: linhas.reduce((s, l) => s + l.quantidade, 0),
+      subtotal, subtotal_fmt: reais(subtotal), desconto: 0, desconto_fmt: "", cupom: "", erro_cupom: null,
+      frete, frete_fmt: frete ? reais(frete) : "Grátis",
+      falta_frete_gratis_fmt: frete && gratis ? reais(gratis - subtotal) : "",
+      total: subtotal + frete, total_fmt: reais(subtotal + frete),
+    };
+  }
+
+  function mensagemLocal(c, d) {
+    const linhas = [`Olá, ${ESTATICO.loja.nome}! Quero fazer este pedido pelo site:`, ""];
+    for (const l of c.linhas) linhas.push(`• ${l.quantidade}x ${l.peca} · ${l.cor} · ${l.tamanho} · ${l.preco_fmt}`);
+    const comp = d.complemento ? `, ${d.complemento}` : "";
+    linhas.push("", `Frete: ${c.frete_fmt}`, `*Total: ${c.total_fmt}*`, "", `Nome: ${d.nome.trim()}`, `WhatsApp: ${d.whatsapp}`,
+      `Entrega: ${d.rua}, ${d.numero}${comp} · ${d.bairro} · ${d.cidade}/${d.uf} · CEP ${d.cep}`);
+    if ((d.observacao || "").trim()) linhas.push(`Obs.: ${d.observacao.trim()}`);
+    return linhas.join("\n");
+  }
 
   function mascaraCep(valor) {
     const d = soDigitos(valor).slice(0, 8);
@@ -263,7 +310,7 @@
       for (const l of cotacao.linhas) {
         const no = modelo.content.firstElementChild.cloneNode(true);
         const $ = (s) => no.querySelector(s);
-        no.querySelectorAll("[data-l-link]").forEach((a) => (a.href = `/peca/${l.slug}`));
+        no.querySelectorAll("[data-l-link]").forEach((a) => (a.href = `${BASE}/peca/${l.slug}`));
         if (l.foto) $("[data-l-foto]").src = l.foto;
         $("[data-l-numero]").textContent = l.numero;
         $("[data-l-nome]").textContent = l.peca;
@@ -302,6 +349,7 @@
       falta.hidden = !cotacao.falta_frete_gratis_fmt;
       falta.textContent = cotacao.falta_frete_gratis_fmt ? `Faltam ${cotacao.falta_frete_gratis_fmt} para o frete grátis.` : "";
 
+      if (!retornoCupom) return;
       retornoCupom.className = "cupom-retorno";
       if (cotacao.erro_cupom) {
         retornoCupom.textContent = cotacao.erro_cupom;
@@ -316,7 +364,7 @@
       const itens = Sacola.ler();
       if (!itens.length) { cotacao = null; render(); return; }
       try {
-        cotacao = await postar("/api/cotacao", { itens: itens.map((i) => ({ variante_id: i.v, quantidade: i.q })), cupom });
+        cotacao = ESTATICO ? cotarLocal(itens) : await postar("/api/cotacao", { itens: itens.map((i) => ({ variante_id: i.v, quantidade: i.q })), cupom });
         if (cotacao.removidos.length) Sacola.gravar(itens.filter((i) => !cotacao.removidos.includes(i.v)));
         if (cotacao.erro_cupom) cupom = "";
         render();
@@ -337,7 +385,7 @@
       atraso = setTimeout(cotar, 120);
     }
 
-    formCupom.addEventListener("submit", (e) => {
+    formCupom?.addEventListener("submit", (e) => {
       e.preventDefault();
       cupom = formCupom.elements.cupom.value.trim().toUpperCase();
       cotar();
@@ -392,6 +440,22 @@
       }
       if (cotacao?.linhas.some((l) => l.quantidade > l.disponivel)) {
         erro.textContent = "Ajuste as peças marcadas na sacola antes de fechar.";
+        return;
+      }
+
+      if (ESTATICO) {
+        const url = `https://wa.me/${soDigitos(ESTATICO.loja.whatsapp)}?text=${encodeURIComponent(mensagemLocal(cotacao, dados))}`;
+        try {
+          const { observacao, ...lembrar } = dados;
+          delete lembrar.pagamento;
+          localStorage.setItem(CHAVE_DADOS, JSON.stringify(lembrar));
+        } catch { /* modo privado */ }
+        Sacola.limpar();
+        q("[data-cheio]").hidden = true;
+        q("[data-enviado]").hidden = false;
+        q("[data-link-enviado]").href = url;
+        window.scrollTo({ top: 0 });
+        window.location.href = url;
         return;
       }
 

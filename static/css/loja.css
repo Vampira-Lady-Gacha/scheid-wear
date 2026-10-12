@@ -1084,6 +1084,7 @@ textarea.entrada { resize: vertical; }
 }
 .campo-cep small a { color: var(--tinta-2); }
 .pagamento { grid-template-columns: 1fr; }
+.opcao-nota { display: flex; gap: 10px; align-items: flex-start; color: var(--tinta-2); }
 .opcao {
   display: grid;
   grid-template-columns: auto 1fr;

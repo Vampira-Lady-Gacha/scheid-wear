@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-base="{{ base }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -81,12 +81,13 @@
       </div>
       <div class="rodape-base">
         <span>© {{ loja.nome_loja }} · Pagamento por Pix · Envio para todo o Brasil</span>
-        <a href="/admin">Área da equipe</a>
+        {% if not estatico %}<a href="/admin">Área da equipe</a>{% endif %}
       </div>
     </div>
   </footer>
 
   <div class="recado" data-recado role="status" aria-live="polite" hidden></div>
+  {% if estatico %}<script>window.SCHEID = {{ {"dados": dados_estaticos, "loja": {"nome": loja.nome_loja, "whatsapp": loja.whatsapp, "frete_fixo": loja.frete_fixo, "frete_gratis_acima": loja.frete_gratis_acima}} | tojson }};</script>{% endif %}
   <script src="/static/js/loja.js?v={{ VERSAO_ESTATICOS }}" defer></script>
   {% block scripts %}{% endblock %}
 </body>

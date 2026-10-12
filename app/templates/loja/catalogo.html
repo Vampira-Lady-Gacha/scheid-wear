@@ -15,6 +15,7 @@
     <p class="rotulo-impresso contagem">{{ pecas | length }} {{ 'peça' if pecas | length == 1 else 'peças' }}</p>
   </div>
 
+  {% if not estatico %}
   <div class="filtros">
     <nav class="filtro-linha" aria-label="Categorias">
       <a class="filtro" href="{{ url_filtro('categoria', '') }}" {% if not cat_atual %}aria-current="true"{% endif %}>Tudo</a>
@@ -46,6 +47,7 @@
       <noscript><button class="botao" type="submit">Filtrar</button></noscript>
     </form>
   </div>
+  {% endif %}
 
   {% if pecas %}
   <div class="trilho">

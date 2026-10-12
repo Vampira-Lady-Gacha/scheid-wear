@@ -26,5 +26,9 @@ SECRET_KEY = _chave_secreta()
 COOKIE_SEGURO = os.environ.get("COOKIE_SEGURO", "0") == "1"
 URL_PUBLICA = os.environ.get("URL_PUBLICA", "").rstrip("/")
 
+# Versão estática (GitHub Pages): sem servidor, a sacola fecha o pedido pelo WhatsApp.
+ESTATICO = os.environ.get("LOJA_ESTATICO", "0") == "1"
+BASE = os.environ.get("LOJA_BASE", "").rstrip("/")
+
 TAMANHO_MAX_FOTO = 8 * 1024 * 1024
 LADO_MAX_FOTO = 1400

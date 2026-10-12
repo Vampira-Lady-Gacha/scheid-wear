@@ -5,3 +5,4 @@ dados/
 .impeccable/answer.txt
 .impeccable/config.local.json
 .pytest_cache/
+site/
